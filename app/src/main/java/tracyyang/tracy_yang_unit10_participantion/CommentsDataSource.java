@@ -33,6 +33,7 @@ public class CommentsDataSource {
         dbHelper.close();
     }
 
+    //Creating comments
     public Comment createComment(String comment) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_COMMENT, comment);
@@ -47,6 +48,7 @@ public class CommentsDataSource {
         return newComment;
     }
 
+    //Deleting comments
     public void deleteComment(Comment comment) {
         long id = comment.getId();
         System.out.println("Comment deleted with id: " + id);
@@ -54,18 +56,27 @@ public class CommentsDataSource {
                 + " = " + id, null);
     }
 
+    //Getting all comments
     public List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
 
         Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
                 allColumns, null, null, null, null, null);
 
-        cursor.moveToFirst();
+        /*cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Comment comment = cursorToComment(cursor);
             comments.add(comment);
             cursor.moveToNext();
+        }*/
+
+        while (cursor.moveToNext()){
+            //Comment comment = cursorToComment(cursor);
+            Comment comment = cursorToCommentNew(cursor.getLong(0),cursor.getString(1));
+            comments.add(comment);
+            cursor.moveToFirst();
         }
+
         // make sure to close the cursor
         cursor.close();
         return comments;
@@ -75,6 +86,12 @@ public class CommentsDataSource {
         Comment comment = new Comment();
         comment.setId(cursor.getLong(0));
         comment.setComment(cursor.getString(1));
+        return comment;
+    }
+
+    private Comment cursorToCommentNew (long cds_id, String cds_Comments)
+    {
+        Comment comment = new Comment(cds_id, cds_Comments);
         return comment;
     }
 }
